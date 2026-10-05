@@ -1,0 +1,28 @@
+@if (auth.isLoggedIn()) {
+  <header class="app-header">
+    <div class="container header-inner">
+      <a class="brand" routerLink="/recetas">
+        <span class="brand-dot"></span>MedPharm
+      </a>
+
+      <nav class="nav-links">
+        <a routerLink="/recetas" routerLinkActive="active">Recetas</a>
+        @if (auth.rol() === 'MEDICO') {
+          <a routerLink="/nueva-receta" routerLinkActive="active">Nueva receta</a>
+        }
+      </nav>
+
+      <div class="user">
+        <span class="user-info">
+          {{ auth.sesion()?.username }}
+          <span class="user-rol">{{ auth.rol() === 'MEDICO' ? 'Médico' : 'Farmacéutico' }}</span>
+        </span>
+        <button type="button" class="logout" (click)="auth.logout()">Salir</button>
+      </div>
+    </div>
+  </header>
+}
+
+<main class="container py-4 py-md-5">
+  <router-outlet />
+</main>

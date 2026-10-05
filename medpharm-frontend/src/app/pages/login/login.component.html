@@ -1,0 +1,52 @@
+<div class="login-wrapper">
+  <div class="card">
+    <div class="card-body p-4 p-sm-5">
+      <div class="brand mb-4">
+        <span class="brand-dot"></span>MedPharm Express
+      </div>
+      <h1 class="h4 mb-1">Iniciar sesión</h1>
+      <p class="text-secondary small mb-4">Ingrese sus credenciales para continuar.</p>
+
+      @if (errorServidor()) {
+        <div class="alert alert-danger py-2" role="alert">{{ errorServidor() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div class="mb-3">
+          <label for="username" class="form-label">Usuario</label>
+          <input id="username" type="text" class="form-control" formControlName="username"
+                 autocomplete="username" [class.is-invalid]="campoInvalido('username')" />
+          @if (campoInvalido('username')) {
+            <div class="invalid-feedback">El usuario es requerido.</div>
+          }
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="form-label">Contraseña</label>
+          <input id="password" type="password" class="form-control" formControlName="password"
+                 autocomplete="current-password" [class.is-invalid]="campoInvalido('password')" />
+          @if (form.controls.password.hasError('required') && campoInvalido('password')) {
+            <div class="invalid-feedback">La contraseña es requerida.</div>
+          }
+          @if (form.controls.password.hasError('minlength')) {
+            <div class="invalid-feedback">
+              Mínimo 6 caracteres (lleva {{ form.controls.password.value.length }}).
+            </div>
+          }
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100" [disabled]="cargando()">
+          @if (cargando()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>Ingresando...
+          } @else {
+            Ingresar
+          }
+        </button>
+      </form>
+
+      <p class="small text-secondary mt-4 mb-0">
+        Pruebas: <code>medico1</code> / <code>farma1</code> · <code>password123</code>
+      </p>
+    </div>
+  </div>
+</div>
