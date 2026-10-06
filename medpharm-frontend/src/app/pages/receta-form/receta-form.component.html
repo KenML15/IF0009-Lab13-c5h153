@@ -1,1 +1,123 @@
-<p>receta-form works!</p>
+<div class="page-header">
+  <div>
+    <h1 class="h3 mb-1">Nueva receta</h1>
+    <p class="text-secondary mb-0">Complete los datos del paciente y los medicamentos prescritos.</p>
+  </div>
+</div>
+
+@if (auth.rol() !== 'MEDICO') {
+  <div class="alert alert-danger">
+    Solo los usuarios con rol Médico pueden emitir recetas.
+    <a routerLink="/recetas">Volver al listado</a>
+  </div>
+} @else {
+
+  @if (errorServidor()) {
+    <div class="alert alert-danger" role="alert">{{ errorServidor() }}</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+    <!-- Paciente -->
+    <section class="card mb-3">
+      <div class="card-body p-4">
+        <h2 class="seccion">Paciente</h2>
+        <label for="pacienteNombre" class="form-label">Nombre completo</label>
+        <input id="pacienteNombre" type="text" class="form-control" formControlName="pacienteNombre"
+               placeholder="Ej. Mariana Fallas Cordero"
+               [class.is-invalid]="mostrarError(form.controls.pacienteNombre)" />
+        @if (mostrarError(form.controls.pacienteNombre)) {
+          <div class="invalid-feedback">
+            @if (form.controls.pacienteNombre.hasError('required')) {
+              El nombre del paciente es requerido.
+            } @else if (form.controls.pacienteNombre.hasError('minlength')) {
+              Debe tener al menos 5 caracteres.
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Medicamentos (FormArray) -->
+    <section class="card mb-4">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="seccion mb-0">Medicamentos <span class="text-secondary">({{ detalles.length }})</span></h2>
+          <button type="button" class="btn btn-sm btn-outline-secondary" (click)="agregarDetalle()">
+            + Agregar medicamento
+          </button>
+        </div>
+
+        <div formArrayName="detalles">
+          @for (detalle of detalles.controls; track detalle; let i = $index) {
+            <div class="linea" [formGroupName]="i">
+              <div class="row g-3">
+
+                <div class="col-md-5">
+                  <label [for]="'med-' + i" class="form-label">Medicamento</label>
+                  <select [id]="'med-' + i" class="form-select" formControlName="medicamentoId"
+                          [class.is-invalid]="mostrarError(detalle.controls.medicamentoId)">
+                    <option [ngValue]="null" disabled>Seleccione...</option>
+                    @for (m of medicamentos(); track m.id) {
+                      <option [ngValue]="m.id">{{ m.nombre }}</option>
+                    }
+                  </select>
+                  @if (mostrarError(detalle.controls.medicamentoId)) {
+                    <div class="invalid-feedback">Seleccione un medicamento.</div>
+                  } @else if (stockDisponible(i) !== null) {
+                    <div class="form-text">Disponible: {{ stockDisponible(i) }} unidades</div>
+                  }
+                </div>
+
+                <div class="col-md-2">
+                  <label [for]="'cant-' + i" class="form-label">Cantidad</label>
+                  <input [id]="'cant-' + i" type="number" min="1" step="1" class="form-control"
+                         formControlName="cantidad"
+                         [class.is-invalid]="mostrarError(detalle.controls.cantidad)" />
+                  @if (mostrarError(detalle.controls.cantidad)) {
+                    <div class="invalid-feedback">
+                      @if (detalle.controls.cantidad.hasError('required')) {
+                        Requerida.
+                      } @else if (detalle.controls.cantidad.hasError('positivo')) {
+                        Debe ser un entero mayor a 0.
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div class="col-md-4">
+                  <label [for]="'dosis-' + i" class="form-label">Dosis indicada</label>
+                  <input [id]="'dosis-' + i" type="text" class="form-control" formControlName="dosisIndicada"
+                         placeholder="Ej. 1 tableta cada 8 horas por 5 días"
+                         [class.is-invalid]="mostrarError(detalle.controls.dosisIndicada)" />
+                  @if (mostrarError(detalle.controls.dosisIndicada)) {
+                    <div class="invalid-feedback">La dosis es requerida.</div>
+                  }
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end">
+                  <button type="button" class="btn-quitar" title="Quitar medicamento"
+                          [disabled]="detalles.length === 1" (click)="eliminarDetalle(i)">
+                    ✕
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <div class="acciones">
+      <a routerLink="/recetas" class="btn btn-outline-secondary">Cancelar</a>
+      <button type="submit" class="btn btn-primary" [disabled]="enviando()">
+        @if (enviando()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>Guardando...
+        } @else {
+          Emitir receta
+        }
+      </button>
+    </div>
+  </form>
+}

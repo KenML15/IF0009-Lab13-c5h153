@@ -1,0 +1,44 @@
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.seccion {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.linea {
+  padding: 1rem 0;
+  border-top: 1px solid var(--mp-border);
+}
+
+.linea:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.btn-quitar {
+  width: 100%;
+  height: 38px;
+  background: none;
+  border: 1px solid var(--mp-border);
+  border-radius: var(--mp-radius);
+  color: var(--mp-muted);
+}
+
+.btn-quitar:hover:not(:disabled) {
+  color: #b91c1c;
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.btn-quitar:disabled {
+  opacity: 0.4;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
