@@ -28,6 +28,7 @@ public class WebSecurityConfig {
     private final JwtUtils jwtUtils;
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthEntryPointJwt unauthorizedHandler;
+    private final AccessDeniedHandlerJwt accessDeniedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -45,7 +46,9 @@ public class WebSecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)            // API stateless, no usa cookies
             .cors(Customizer.withDefaults())                  // usa el bean corsConfigurationSource
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
+            .exceptionHandling(e -> e
+                .authenticationEntryPoint(unauthorizedHandler)   // 401
+                .accessDeniedHandler(accessDeniedHandler))       // 403
             .headers(h -> h.frameOptions(f -> f.sameOrigin())) // para que cargue la consola H2
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // preflight CORS
